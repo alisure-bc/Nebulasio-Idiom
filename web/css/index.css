@@ -1,0 +1,92 @@
+
+input, ul, li, p{
+    margin: 0;
+    padding: 0;
+}
+
+#Content{
+    background-color: #000;
+    width: 90%;
+    min-width: 390px;
+    max-width: 800px;
+    min-height: 500px;
+    margin: 60px auto;
+    border-radius: 10px;
+}
+
+#SearchFirst, #SearchTwo{
+    display: flex;
+    flex-direction: column;
+    align-items: center;  /*交叉轴：左右*/
+    height: 100%;
+
+    font-size: 0;  /*间隔的问题。或者去掉两个input之间的空格*/
+}
+#SearchFirst{
+    /*justify-content: center;*/  /*主轴：上下*/
+    padding-top: 100px;
+}
+#SearchTwo{
+    justify-content: flex-start;  /*主轴：上下*/
+    padding-top: 50px;
+}
+
+#SearchFirst .title{
+    width: 160px;
+    height: 60px;
+    font-size: 30px;
+    line-height: 60px;
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 2px;
+    background-color: #eeeeee;
+    border-radius: 20px;
+}
+#SearchFirst .info{
+    background-color: #eeeeee;
+    max-width: 80%;
+    font-size: 14px;
+    margin: 30px 0;
+    border-radius: 10px;
+}
+#SearchFirst .info p{
+    line-height: 24px;
+    padding: 5px 20px;
+}
+
+input{
+    text-align: center;
+    outline: none;
+    font-size: 18px;
+    padding: 2px 10px;
+    border: 1px solid #eeeeee;
+}
+input:focus{
+    background-color: #ffffff;
+}
+
+.search  .search_text{
+    height: 40px;
+    width: 200px;
+    border-radius: 10px 0 0 10px;
+}
+.search  .search_button{
+    height: 46px;
+    width: 80px;
+    padding: 2px 15px;
+    font-size: 22px;
+    background-color: #cccccc;
+    border-radius: 0 10px 10px 0;
+    vertical-align:bottom;  /*不对齐的问题*/
+}
+.search  .search_button:hover{
+    cursor: pointer;
+    color: #333333;
+    background-color: #999999;
+}
+.search  .search_button:active{
+    cursor: pointer;
+    color: #aaaaaa;
+    background-color: #666666;
+}
+
