@@ -46,7 +46,7 @@ IdiomChainContract.prototype = {
 
     //创建一条成语链，判断成语是否存在，存在则不能创建，不存在则创建成语链，并显示该链
     createIdiomChain: function(_idiom, _address, _storageTime) {
-        var idiomExist = isIdiomExists(_idiom);
+        var idiomExist = this.isIdiomExists(_idiom);
         //成语不存在，可以创建
         
         if (!idiomExist) {
@@ -63,26 +63,26 @@ IdiomChainContract.prototype = {
             //成语池总数量加1
             this.idiomNumber++;
 
-            //发布奖励
-            var result = Blockchain.transfer(_address, addAward);//这个单位还不是很清楚
-            if(!result) {
-                Event.Trigger("TransferAwardFailed", {
-                    Transfer: {
-                        from: Blockchain.transaction.to,
-                        to: _address,
-                        value: addAward
-                    }
-                });
-                throw new Error("Award transfer failed. Receiver Address:" + _address + ", NAS(Wei):" + addAward);
-            }
+            // //发布奖励
+            // var result = Blockchain.transfer(_address, addAward);//这个单位还不是很清楚
+            // if(!result) {
+            //     Event.Trigger("TransferAwardFailed", {
+            //         Transfer: {
+            //             from: Blockchain.transaction.to,
+            //             to: _address,
+            //             value: addAward
+            //         }
+            //     });
+            //     throw new Error("Award transfer failed. Receiver Address:" + _address + ", NAS(Wei):" + addAward);
+            // }
 
-            Event.Trigger("TransferAwardSuccessful", {
-                Transfer: {
-                    from: Blockchain.transaction.to,
-                    to: _address,
-                    value: addAward
-                }
-            });
+            // Event.Trigger("TransferAwardSuccessful", {
+            //     Transfer: {
+            //         from: Blockchain.transaction.to,
+            //         to: _address,
+            //         value: addAward
+            //     }
+            // });
 
             return true;
         } else {
@@ -91,7 +91,7 @@ IdiomChainContract.prototype = {
     },
     //查询成语是否存在，存在显示它在的所有链，不存在显示不存在
     checkIdiomInChains: function(_idiom) {
-        var idiomExist = isIdiomExists(_idiom);
+        var idiomExist = this.isIdiomExists(_idiom);
         var id;
         for (var i = 0; i < this.idiomNumber; i++) {
             if(_idiom == this.idiomPool.get(i).idiom) {
@@ -108,7 +108,7 @@ IdiomChainContract.prototype = {
         var chainStr;
         for (var i = 0; i < this.chainNumber; i++) {
             chainStr = this.idiomChains.get(i);
-            if(isIdiomInChain(idStr, chainStr)){
+            if(this.isIdiomInChain(idStr, chainStr)){
                 array.push(i);
             }
         }
@@ -116,7 +116,7 @@ IdiomChainContract.prototype = {
         //存储每一条存在搜索成语的链
         for (var i = 0; i < array.length; i++) {
             result = result + "{id:" + array[i] + ",content:";
-            result += getInfoByChain(array[i]);
+            result += this.getInfoByChain(array[i]);
             result += "},";
         }
         result = result.substring(0, result.length-1);
