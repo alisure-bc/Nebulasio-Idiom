@@ -255,4 +255,6 @@ WordMapLineContract.prototype = {
         }
         return result;
     }
-}
+};
+
+module.exports = WordMapLineContract;
