@@ -45,7 +45,7 @@ IdiomChainContract.prototype = {
     },
 
     //创建一条成语链，判断成语是否存在，存在则不能创建，不存在则创建成语链，并显示该链
-    createIdiomChain: function(_idiom, _address) {
+    createIdiomChain: function(_idiom) {
 
         //检查地址是否符合规范
 
@@ -54,7 +54,7 @@ IdiomChainContract.prototype = {
         
         if (!idiomExist) {
             var player = new Player();
-            player.address = _address;
+            player.address = Blockchain.transaction.from;
             player.idiom = _idiom;
             player.storageTime = this.getCurrentTime();
             //添加成语到成语池里
@@ -126,9 +126,8 @@ IdiomChainContract.prototype = {
         result += "]";
         return result;
     },
-
     //添加成语到某条链，判断成语和该链上的最后一个成语是否符合规则，符合就添加，不符合就返回信息提示
-    addIdiomToChain: function(_idiom, _address, _chainId) {
+    addIdiomToChain: function(_idiom, _chainId) {
 
         //检查地址是否符合规范
 
@@ -136,9 +135,10 @@ IdiomChainContract.prototype = {
         var str = this.idiomChains.get(_chainId);
         var index = str.lastIndexOf(",");
         var id = str.substring(index + 1);
-        
-        if (_idiom.substring(0,1) != this.idiomPool.get(parseInt(id)).idiom.substring(3)) {
-            return false;
+        var now_idiom =  this.idiomPool.get(parseInt(id)).idiom;
+        if (_idiom.substring(0,1) != now_idiom.substring(now_idiom.length - 1)) {
+            /*..........................*/
+            throw new Error("key or value exceed limit length");
         } else {
             //成语不能与成语池里的成语重复,若存在，直接添加该成语在成语池中的编号到成语链中
             if (this.isIdiomExists(_idiom)) {//池中存在
@@ -151,7 +151,7 @@ IdiomChainContract.prototype = {
             //成语池中不存在该成语，并且符合该成语链 接龙规则
             var player = new Player();
             player.idiom = _idiom;
-            player.address = _address;
+            player.address = Blockchain.transaction.from;
             player.storageTime = this.getCurrentTime();
 
             this.idiomPool.put(this.idiomNumber, player);
@@ -166,6 +166,8 @@ IdiomChainContract.prototype = {
         //符合添加成语到链，添加成语到成语池，返回true
         //不符合，返回false
     },
+
+
     //查询成语在成语字典池中是否存在
     isIdiomExists: function(_idiom) {
         var result = false;
@@ -235,43 +237,44 @@ IdiomChainContract.prototype = {
     },
     //获取当前系统的日期时间，格式为"yyyy-MM-dd HH:MM:SS"
     getCurrentTime: function() {
-        var now = new Date();  
-          
-        var year = now.getFullYear();       //年  
-        var month = now.getMonth() + 1;     //月  
-        var day = now.getDate();            //日  
-        
-        var hh = now.getHours();            //时  
-        var mm = now.getMinutes();          //分  
-        var ss = now.getSeconds();           //秒  
-        
-        var clock = year + "-";  
-        
-        if(month < 10)  
-            clock += "0";  
-        
-        clock += month + "-";  
-        
-        if(day < 10)  
-            clock += "0";  
-            
-        clock += day + " ";  
-        
-        if(hh < 10)  
-            clock += "0";  
-            
-        clock += hh + ":";  
-        if (mm < 10) clock += '0';   
-        clock += mm + ":";   
-        
-        if (ss < 10) clock += '0';   
-        clock += ss;   
+        var now = new Date();
+        now.setHours(now.getHours()+8);
+
+        var year = now.getFullYear();       //年
+        var month = now.getMonth() + 1;     //月
+        var day = now.getDate();            //日
+
+        var hh = now.getHours();            //时
+        var mm = now.getMinutes();          //分
+        var ss = now.getSeconds();           //秒
+
+        var clock = year + "-";
+
+        if(month < 10)
+            clock += "0";
+
+        clock += month + "-";
+
+        if(day < 10)
+            clock += "0";
+
+        clock += day + " ";
+
+        if(hh < 10)
+            clock += "0";
+
+        clock += hh + ":";
+        if (mm < 10) clock += '0';
+        clock += mm + ":";
+
+        if (ss < 10) clock += '0';
+        clock += ss;
         return(clock);
    }
 };
 
 module.exports = IdiomChainContract;
 
-//n1piePknnHaNGH259VUgXfQyUyy5zs8WFwm
+//n1gbvnmGDvfQ2Tpb8sKYdrKTcniTgfTEjH5
 //前台应该不能输入地址，直接根据他调用的地址填上去
 //添加数据之后要对该交易进行交易查询，知道success才可以停止周期查询

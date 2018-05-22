@@ -1,23 +1,21 @@
 
-nebulas = require("nebulas");
+var Nebulas = require("nebulas");
+var NebPay = require("nebpay");
+
+/*创建交易*/
+var neb = new Nebulas.Neb();
+neb.setRequest(new Nebulas.HttpRequest("https://testnet.nebulas.io"));
+var nebPay = new NebPay();
+
+var dapp_address = "n1gbvnmGDvfQ2Tpb8sKYdrKTcniTgfTEjH5";
 
 /*封装合约参数*/
-var Contract = function (dapp_address) {
-    this.dapp_address = dapp_address;
-    this.neb = new nebulas.Neb();
-    this.neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
-
-    this.account = nebulas.Account;
-    this.from = this.account.NewAccount().getAddressString();
-
+var ContractValue = function () {
     this.value = "0";
     this.nonce = "0";
     this.gas_price = "1000000";
     this.gas_limit = "2000000";
 };
-
-/*初始化合约*/
-var contract_class = new Contract("n1yCJnQWq9YHSDszfhrfyG8zRxkJcCiZe67");
 
 
 /*初始化，一些界面的设置*/
@@ -30,13 +28,11 @@ function init() {
     /*设置创建成语链*/
     $("#SearchTwo .create_button").click(function () {
         var value = $(this).parent().find(".create_text").val();
-        var address = $(this).parent().find(".create_address").val();
         /*需要检查一下*/
         alert("check value");
-        create_get_data(value, address, contract_class, function () {
+        create_data(value, function (search_value) {
             alert("创建失败了哥！");
         }, function (search_value) {
-            alert("创建成功了哥！");
             check_idiom(search_value);
         });
         /*成功后搜索成语，得到该成语所在的成语链*/
@@ -82,7 +78,7 @@ function check_idiom(search_value) {
 /*检查成语成功后的回调：根据search_value，搜索信息*/
 function search_idiom_fn(search_value) {
     /*联网去搜索信息*/
-    search_get_data(search_value, contract_class, function () {
+    search_data(search_value, function () {
         search_null(search_value);
     }, function (data) {
         search_ok(search_value, data);
@@ -150,9 +146,11 @@ function _show_search_result(search_value, result) {
     $("#SearchTwo .append_button").off("click").on("click", function () {
         var id = $(this).parent().attr("data_id");
         var value = $(this).parent().find(".append_text").val();
-        var address = $(this).parent().find(".append_address").val();
-        alert("调用api进行处理:" + id + value + address);
-
+        append_data(value, parseInt(id), function () {
+            alert("接续失败了哥！");
+        }, function (value) {
+            check_idiom(value);
+        });
         /*成功后搜索成语，得到该成语所在的成语链*/
     });
 
@@ -167,97 +165,109 @@ function search_null(search_value) {
     if(search_value.length >= 1){
         $("#SearchTwo .search_null .count .text").text(search_value);
         $("#SearchTwo .search_null .search_text").val(search_value);
+        $("#SearchTwo .create_text").val(search_value);
     }
 }
 
 
-/*封装请求函数*/
-function get_data(contract_class, contract, callback) {
-    contract_class.neb.api.call(contract_class.from, contract_class.dapp_address, contract_class.value,
-        contract_class.nonce, contract_class.gas_price, contract_class.gas_limit, contract).then(function (resp) {
-        callback(resp);
-    }).catch(function (err) {
-        console.log("error:" + err.message);
-        alert("error: " + err.message);
-    });
-}
-
 /*查询*/
-function search_get_data(search_value, contract_class, callback_null, callback_ok) {
-    var now_contract = {
+function search_data(search_value, callback_null, callback_ok) {
+    /*初始化合约*/
+    var contract_value = new ContractValue();
+    var from = Nebulas.Account.NewAccount().getAddressString();
+    var contract_fn = {
         "function": "checkIdiomInChains",
         "args": "[\"" + search_value + "\"]"
     };
-    get_data(contract_class, now_contract, function (resp) {
-        console.log("search ... :" + search_value + ", " + resp);
-        if(resp.result !== "false" && resp.result !== "null"){
-            callback_ok(JSON.parse(JSON.parse(resp.result)));
-        }else{
-            callback_null();
-        }
-    })
+
+    neb.api.call(from, dapp_address, contract_value.value, contract_value.nonce,
+        contract_value.gas_price, contract_value.gas_limit, contract_fn)
+        .then(function (resp) {
+            if(resp.result !== "false" && resp.result !== "null"){
+                callback_ok(JSON.parse(JSON.parse(resp.result)));
+            }else{
+                callback_null();
+            }
+            console.log("search ... :" + search_value + ", " + resp);
+        }).catch(function (err) {
+            console.log("error:" + err.message);
+            alert("error: " + err.message);
+        });
+
 }
 
-/*查询*/
-function create_get_data(idiom_value, user_address, contract_class, callback_error, callback_ok) {
+/*创建*/
+function create_data(idiom_value, callback_error, callback_ok) {
+    /*初始化合约*/
+    var contract_value = new ContractValue();
     var now_contract = {
         "function": "createIdiomChain",
-        "args": "[\"" + idiom_value + "\", \"" + user_address + "\", \"" + get_time() + "\"]"
+        "args": "[\"" + idiom_value + "\"]"
     };
-    get_data(contract_class, now_contract, function (resp) {
-        console.log("create ... :" + idiom_value + ", " + resp);
-        if(resp.result !== "false"){
-            callback_ok(idiom_value);
-        }else{
-            callback_error();
-        }
-    })
+
+    /*发生交易，返回交易序号*/
+    var serialNumber = nebPay.call(dapp_address, contract_value.value, now_contract.function, now_contract.args, {listener: print_result});
+
+    /*定时查询交易是否成功，成功后执行回调：查询该条成语*/
+    var intervalQuery = setInterval(function () {
+        funcIntervalQuery();
+    }, 10000);
+
+    function funcIntervalQuery() {
+        nebPay.queryPayInfo(serialNumber)
+            .then(function (resp) {
+                print_result(resp);
+                var respObject = JSON.parse(resp);
+                if(respObject.code === 0 && respObject.data.status === 1){
+                    clearInterval(intervalQuery);
+                    callback_ok(idiom_value)
+                }
+            }).catch(function (err) {
+                callback_error(idiom_value)
+            });
+    }
 }
 
-/*获取事件*/
-function get_time() {
-    var date = new Date();
-    var seperator1 = "-";
-    var seperator2 = ":";
-    var month = date.getMonth() + 1;
-    var strDate = date.getDate();
-    if (month >=1 && month <= 9) {
-        month = "0" + month;
+/*追加*/
+function append_data(idiom_value, chain_id, callback_error, callback_ok) {
+    /*初始化合约*/
+    var contract_value = new ContractValue();
+    var now_contract = {
+        "function": "addIdiomToChain",
+        "args": "[\"" + idiom_value + "\", \"" + chain_id + "\"]"
+    };
+
+    /*发生交易，返回交易序号*/
+    var serialNumber = nebPay.call(dapp_address, contract_value.value, now_contract.function, now_contract.args, {listener: print_result});
+
+    /*定时查询交易是否成功，成功后执行回调：查询该条成语*/
+    var intervalQuery = setInterval(function () {
+        funcIntervalQuery();
+    }, 10000);
+
+    function funcIntervalQuery() {
+        nebPay.queryPayInfo(serialNumber)
+            .then(function (resp) {
+                print_result(resp);
+                var respObject = JSON.parse(resp);
+                if(respObject.code === 0 && respObject.data.status === 1){
+                    clearInterval(intervalQuery);
+                    callback_ok(idiom_value)
+                }
+            }).catch(function (err) {
+            callback_error(idiom_value)
+        });
     }
-    if(strDate >=0 && strDate <=9) {
-        strDate = "0" + strDate;
-    }
-    var currentDate = date.getFullYear() + seperator1 + month
-        + seperator1 + strDate + " " + date.getHours()
-        + seperator2 + date.getMinutes() + seperator2
-        + date.getSeconds();
-    return currentDate;
+}
+
+/*打印网络返回的结果*/
+function print_result(resp) {
+    console.log("response of push: " + JSON.stringify(resp))
 }
 
 $(function () {
     /*初始化*/
     init();
-
-    function deal_get(resp) {
-        var result = resp.result;
-        console.log("return of rpn call: " + JSON.stringify(result));
-
-        if(result === "null"){
-            alert("error in deal_get: " + result);
-        }else{
-            try{
-                result = JSON.parse(result);
-            }catch (err) {
-                alert("error in deal_get: " + err.message);
-            }
-            if (!!result.key){
-                alert("ok: key=" + result.key + ", value=" +
-                    result.value + ", author=" + result.author + ", time=" + result.time);
-            }else{
-                alert("result in deal_get: " + result);
-            }
-        }
-    }
 
     /*启动搜索*/
     search_init();
