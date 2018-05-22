@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo</title>
+
+    <script type="text/javascript" src="./js/main.js"></script>
+    <script src="./js/jQuery/jquery-3.3.1.min.js"></script>
+
+    <script src="./js/lib/nebPay.js"></script>
+    <script src="./js/lib/nebulas.js"></script>
+
+</head>
+<body>
+
+<div>
+    <input id="search_value" type="text"><button id="search">search</button>
+</div>
+
+<script>
+
+    "usr strict";
+
+    var dapp_address = "n1kEz9Sa3d3QSxodFMeT4HumQ3xn48Jbnr4";
+
+    var nebulas = require("nebulas");
+    var Account = nebulas.Account;
+    var neb = new nebulas.Neb();
+
+    neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
+
+    // search
+    $("#search").click(function () {
+        var from = Account.NewAccount().getAddressString();
+
+        var value = "0";
+        var nonce = "0";
+        var gas_price = "1000000";
+        var gas_limit = "2000000";
+        var callFunction = "get";
+        var callArgs = "[\"" + $("#search_value").val() + "\"]";
+
+        var contract = {
+            "function": callFunction,
+            "args": callArgs
+        };
+
+        neb.api.call(from, dapp_address, value, nonce, gas_price, gas_limit, contract).then(function (resp) {
+            deal_get(resp);
+        }).catch(function (err) {
+            console.log("error:" + err.message);
+            alert("error: " + err.message);
+        });
+
+
+    });
+
+    function deal_get(resp) {
+        var result = resp.result;
+        console.log("return of rpn call: " + JSON.stringify(result));
+
+        if(result === "null"){
+            alert("error in deal_get: " + result);
+        }else{
+            try{
+                result = JSON.parse(result);
+            }catch (err) {
+                alert("error in deal_get: " + err.message);
+            }
+            if (!!result.key){
+                alert("ok: key=" + result.key + ", value=" +
+                    result.value + ", author=" + result.author + ", time=" + result.time);
+            }else{
+                alert("result in deal_get: " + result);
+            }
+        }
+    }
+
+</script>
+
+</body>
+</html>
