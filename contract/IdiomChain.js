@@ -45,7 +45,7 @@ IdiomChainContract.prototype = {
     },
 
     //创建一条成语链，判断成语是否存在，存在则不能创建，不存在则创建成语链，并显示该链
-    createIdiomChain: function(_idiom, _address, _storageTime) {
+    createIdiomChain: function(_idiom, _address) {
 
         //检查地址是否符合规范
 
@@ -56,7 +56,7 @@ IdiomChainContract.prototype = {
             var player = new Player();
             player.address = _address;
             player.idiom = _idiom;
-            player.storageTime = _storageTime;
+            player.storageTime = this.getCurrentTime();
             //添加成语到成语池里
             this.idiomPool.put(this.idiomNumber, player);
             //创建一条成语链，把成语id加进去
@@ -118,7 +118,7 @@ IdiomChainContract.prototype = {
         var result = "[";
         //存储每一条存在搜索成语的链
         for (var i = 0; i < array.length; i++) {
-            result = result + "{id:" + array[i] + ",content:";
+            result = result + "{\"id\":" + array[i] + ",\"content\":";
             result += this.getInfoByChain(array[i]);
             result += "},";
         }
@@ -128,7 +128,7 @@ IdiomChainContract.prototype = {
     },
 
     //添加成语到某条链，判断成语和该链上的最后一个成语是否符合规则，符合就添加，不符合就返回信息提示
-    addIdiomToChain: function(_idiom, _address, _storageTime, _chainId) {
+    addIdiomToChain: function(_idiom, _address, _chainId) {
 
         //检查地址是否符合规范
 
@@ -140,15 +140,19 @@ IdiomChainContract.prototype = {
         if (_idiom.substring(0,1) != this.idiomPool.get(parseInt(id)).idiom.substring(3)) {
             return false;
         } else {
-            //成语不能与成语池里的成语重复
+            //成语不能与成语池里的成语重复,若存在，直接添加该成语在成语池中的编号到成语链中
             if (this.isIdiomExists(_idiom)) {//池中存在
-                return false;
+                var result = this.idiomChains.get(_chainId);
+                result += "," + this.getIdiomIdFromPool(_idiom);
+
+                this.idiomChains.put(_chainId, result);
+                return true;
             }
             //成语池中不存在该成语，并且符合该成语链 接龙规则
             var player = new Player();
             player.idiom = _idiom;
             player.address = _address;
-            player.storageTime = _storageTime;
+            player.storageTime = this.getCurrentTime();
 
             this.idiomPool.put(this.idiomNumber, player);
             
@@ -191,7 +195,7 @@ IdiomChainContract.prototype = {
     //返回一条成语链上的所有成语信息
     getInfoByChain: function(_chainId) {
 
-        var result = "[{";
+        var result = "[";
         var chainStr = this.idiomChains.get(_chainId);
         var strs = chainStr.split(",");
 
@@ -201,9 +205,73 @@ IdiomChainContract.prototype = {
             result += JSON.stringify(player) + ",";
         }
         result = result.substring(0, result.length-1);
-        result += "}]";
+        result += "]";
         return result;
-    }
+    },
+
+    //返回成语池中所有成语集合
+    getAllIdiomFromPool: function() {
+        if (this.idiomNumber == 0) {
+            return null;
+        } else {
+            var result = "";
+            for (var i = 0; i < this.idiomNumber; i++) {
+                result += this.idiomPool.get(i).idiom + ",";
+            }
+            result = result.substring(0, result.length-1);
+            return result;
+        }
+    },
+    //返回成语在成语池里的id
+    getIdiomIdFromPool: function(_idiom) {
+        var result = null;
+        for (var i = 0; i < this.idiomNumber; i++) {
+            if(_idiom == this.idiomPool.get(i).idiom) {
+                result = "" + i;
+                break;
+            }
+        }
+        return result;
+    },
+    //获取当前系统的日期时间，格式为"yyyy-MM-dd HH:MM:SS"
+    getCurrentTime: function() {
+        var now = new Date();  
+          
+        var year = now.getFullYear();       //年  
+        var month = now.getMonth() + 1;     //月  
+        var day = now.getDate();            //日  
+        
+        var hh = now.getHours();            //时  
+        var mm = now.getMinutes();          //分  
+        var ss = now.getSeconds();           //秒  
+        
+        var clock = year + "-";  
+        
+        if(month < 10)  
+            clock += "0";  
+        
+        clock += month + "-";  
+        
+        if(day < 10)  
+            clock += "0";  
+            
+        clock += day + " ";  
+        
+        if(hh < 10)  
+            clock += "0";  
+            
+        clock += hh + ":";  
+        if (mm < 10) clock += '0';   
+        clock += mm + ":";   
+        
+        if (ss < 10) clock += '0';   
+        clock += ss;   
+        return(clock);
+   }
 };
 
 module.exports = IdiomChainContract;
+
+//n1piePknnHaNGH259VUgXfQyUyy5zs8WFwm
+//前台应该不能输入地址，直接根据他调用的地址填上去
+//添加数据之后要对该交易进行交易查询，知道success才可以停止周期查询
