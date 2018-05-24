@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Demo</title>
+    <title>成语接龙</title>
 
     <link href="css/index.css" rel="stylesheet">
+    <link rel="icon" href="img/logo.jpg" type="image/x-icon">
     <script src="./js/jQuery/jquery-3.3.1.min.js"></script>
     <script src="./js/lib/nebPay.js"></script>
     <script src="./js/lib/nebulas.js"></script>
@@ -12,304 +13,109 @@
     <script type="text/javascript" src="./js/main.js"></script>
 
     <style>
-        #SearchTwo .search_result{
-            background-color: #eeeeee;
-            width: 80%;
-            font-size: 14px;
-            margin: 30px 0;
-            border-radius: 10px;
-        }
 
-        /*计数*/
-        #SearchTwo .search_result .count{
-            margin: 15px 20px 0;
-            padding: 10px;
-            text-align: center;
-            font-size: 14px;
-            color: #333333;
-        }
 
-        /*每一条的头部*/
-        #SearchTwo .search_result .one{
-            border: 1px solid #999999;
-            max-width: 100%;
-            margin: 15px 20px 0;
-            border-radius: 10px;
-        }
-        #SearchTwo .search_result .one:first-child{
-            margin-top: 15px;
-        }
-        #SearchTwo .search_result .one:last-child{
-            margin-bottom: 15px;
-        }
-        #SearchTwo .search_result .open{
-            display: flex;
-            justify-content: space-between;
-            background-color: #999999;
-            padding: 10px;
-            border-radius: 10px 10px 0 0;
-        }
-        #SearchTwo .search_result .open:hover{
-            cursor: pointer;
-            background-color: #666666;
-        }
-        #SearchTwo .search_result .open:active{
-            cursor: pointer;
-            background-color: #333333;
-        }
-        #SearchTwo .search_result .open.radius{
-            border-radius: 10px;
-        }
-
-        /*每一条的内容*/
-        #SearchTwo .search_result .items{
-
-        }
-
-        /*每一条中的每一个成语*/
-        #SearchTwo .search_result .item{
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            justify-content: space-around;
-
-            border: 1px solid #666666;
-            border-radius: 5px;
-            margin: 25px;
-            padding: 5px;
-
-            position: relative;
-        }
-        #SearchTwo .search_result .item:hover{
-            background-color: #333333;
-            color: #eeeeee;
-            cursor: pointer;
-        }
-        #SearchTwo .search_result .item:first-child{
-            margin-top: 8px;
-        }
-        #SearchTwo .search_result .item div{
-            margin: 5px 10px;
-        }
-
-        /*当前成语*/
-        #SearchTwo .search_result .item.current{
-            background-color: #666666;
-            color: #eeeeee;
-        }
-        #SearchTwo .search_result .item.current:hover{
-            cursor: pointer;
-            background-color: #333333;
-            color: #eeeeee;
-        }
-
-        /*箭头*/
-        #SearchTwo .search_result .item:before{
-            content: "";
-            width: 6px;
-            height: 20px;
-            position: absolute;
-            bottom: -22px;
-            left: 35px;
-            border-radius: 5px;
-            background-color: #666666;
-        }
-        #SearchTwo .search_result .item:after{
-            content: "";
-            width: 0;
-            height: 0;
-            position: absolute;
-            bottom: -25px;
-            left: 30px;
-            border-top: 6px solid #666666;
-            border-bottom: 0 solid #666666;
-            border-left: 8px solid #0000;
-            border-right: 8px solid #0000;
-        }
-
-        /*追加成语*/
-        #SearchTwo .search_result .append{
-            display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
-            justify-content: space-around;
-
-            border-radius: 5px;
-            margin: 25px 25px 10px;
-        }
-        #SearchTwo .append .append_text{
-            height: 40px;
-            width: 100%;
-            padding: 2px 10px;
-            border-radius: 10px 0 0 10px;
-        }
-        #SearchTwo .append .append_button{
-            height: 46px;
-            width: 120px;
-            padding: 2px 15px;
-            text-align: center;
-            font-size: 22px;
-            background-color: #cccccc;
-            border-radius: 0 10px 10px 0;
-            vertical-align:bottom;  /*不对齐的问题*/
-        }
-        #SearchTwo .append .append_button:hover{
-            cursor: pointer;
-            color: #333333;
-            background-color: #999999;
-        }
-        #SearchTwo .append .append_button:active{
-            cursor: pointer;
-            color: #aaaaaa;
-            background-color: #666666;
-        }
-
-        /*未搜索到结果*/
-        #SearchTwo .search_null{
-            background-color: #eeeeee;
-            width: 80%;
-            font-size: 14px;
-            margin: 30px 0;
-            border-radius: 10px;
-        }
-        /*计数*/
-        #SearchTwo .search_null .count{
-            margin: 15px 20px 5px;
-            padding: 10px;
-            text-align: center;
-            font-size: 14px;
-            color: #333333;
-        }
-
-        /*创建成语链*/
-        #SearchTwo .search_null .create{
-            display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
-            justify-content: space-around;
-
-            border: 1px solid #666666;
-            border-radius: 5px;
-            margin: 5px 25px 10px;
-            padding: 10px;
-
-            font-size: 0;
-        }
-        #SearchTwo .create .create_text{
-            height: 40px;
-            width: 100%;
-            padding: 2px 10px;
-            border-radius: 10px 0 0 10px;
-        }
-        #SearchTwo .create .create_button{
-            height: 46px;
-            width: 120px;
-            padding: 2px 15px;
-            text-align: center;
-            font-size: 22px;
-            background-color: #cccccc;
-            border-radius: 0 10px 10px 0;
-            vertical-align:bottom;  /*不对齐的问题*/
-        }
-        #SearchTwo .create .create_button:hover{
-            cursor: pointer;
-            color: #333333;
-            background-color: #999999;
-        }
-        #SearchTwo .create .create_button:active{
-            cursor: pointer;
-            color: #aaaaaa;
-            background-color: #666666;
-        }
 
     </style>
+
 </head>
 <body>
 
-<div id="Content">
-
-    <div id="SearchFirst">
-        <div class="title">成语接龙</div>
-        <div class="search">
-            <input class="search_text" type="text" value="" placeholder="请输入成语"/>
-            <input class="search_button"  type="button" value="查询">
-        </div>
-        <div class="info">
-            <p>1. 搜索成语链：可以得到在DAPP上的所有成语链，不奖励NAS。</p>
-            <p>2. 创建成语链：当所有的成语链上不存在某成语时，可以该成语为初始成语创建新的成语链。该操作奖励10000W，需要提供钱包地址。</p>
-            <p>3. 接续成语链：在一条成语链后接上一个成语。该操作奖励10000W，需要提供钱包地址。</p>
+<div id="menu">
+    <div class="content">
+        <div><a href="https://nebulas.io/cn/" target="_blank"><img src="img/nebulasx60.png"></a></div>
+        <div class="menu_2">
+            <a href="https://nebulas.io/cn/incentive.html" target="_blank">激励计划</a>
+            <a href="https://github.com/ChengOrangeJu/WebExtensionWallet" target="_blank">钱包插件</a>
+            <a href="https://github.com/nebulasio/web-wallet" target="_blank">下载钱包</a>
         </div>
     </div>
+</div>
 
-    <div id="SearchTwo" style="display: none">
+<div id="top"></div>
 
-        <div class="search">
-            <input class="search_text" type="text" value="" placeholder="请输入成语"/>
-            <input class="search_button"  type="button" value="查询">
+<div id="middle">
+    <div id="Content">
+        <div id="SearchFirst">
+            <div class="title">星云成语链</div>
+            <div class="search">
+                <input class="search_text" type="text" value="" placeholder="请输入成语"/>
+                <input class="search_button"  type="button" value="查询">
+            </div>
+            <div class="info">
+                <p>功能介绍：</p>
+                <p>1. 搜索成语链：可以得到在DAPP上的所有包含该成语的成语链。</p>
+                <p>2. 创建成语链：当所有的成语链上不存在某成语时，可以该成语为初始成语创建新的成语链。</p>
+                <p>3. 接续成语链：在一条成语链后接上一个成语。</p>
+                <p></p>
+                <p>温馨提示：</p>
+                <p>您需要使用Chrome浏览器，并且安装钱包插件。</p>
+            </div>
         </div>
 
-        <div class="search_result" >
-            <div class="count">
-                <p>共有 <span style="color: red; font-size: 16px" class="number">2</span> 条成语链包含：
-                    <span class="text" style="color: red; font-size: 16px">你好成语</span></p>
-                <p style="margin-top: 10px">您可以创接续成语链。若接续成功，您将获得一定的
-                    <span style="color: red; font-size: 16px">NAS奖励</span>，
-                    因此需要您提供<span style="color: red; font-size: 16px">地址</span>。</p>
+        <div id="SearchTwo" style="display: none">
 
+            <div class="search">
+                <input class="search_text" type="text" value="" placeholder="请输入成语"/>
+                <input class="search_button"  type="button" value="查询">
             </div>
 
-            <div id="temp" style="display: none">
-                <div class="result_html_one">
-                    <div class="one">
-                        <div class="open">
-                            <div style="margin-left: 10px" class="index">1</div>
-                            <div>-></div>
-                        </div>
-                        <div class="items">
-                            <!--item-->
-                            <div class="append">
-                                <input class="append_text" type="text" value="" placeholder="请输入成语"/>
-                                <input class="append_button"  type="button" value="接续">
+            <div class="search_result" >
+                <div class="count">
+                    <p>共有 <span style="color: red; font-size: 16px" class="number">2</span> 条成语链包含：
+                        <span class="text" style="color: red; font-size: 16px; margin-right: 10px"></span>, 您可以接续成语链。
+                    </p>
+
+                </div>
+
+                <div id="temp" style="display: none">
+                    <div class="result_html_one">
+                        <div class="one">
+                            <div class="open">
+                                <div style="margin-left: 10px" class="index">1</div>
+                                <div>-></div>
+                            </div>
+                            <div class="items">
+                                <!--item-->
+                                <div class="append">
+                                    <input class="append_text" type="text" value="" placeholder="请输入成语"/>
+                                    <input class="append_button"  type="button" value="接续">
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="result_html_item">
-                    <div class="item">
-                        <div class="value"></div>
-                        <div class="author"></div>
-                        <div class="award"></div>
-                        <div class="time"></div>
+                    <div class="result_html_item">
+                        <div class="item">
+                            <div class="value"></div>
+                            <div class="author"></div>
+                            <div class="time"></div>
+                        </div>
                     </div>
                 </div>
+
+                <!--存放数据-->
+                <div class="result"></div>
             </div>
 
-            <!--存放数据-->
-            <div class="result"></div>
+            <div class="search_null">
+                <div class="count">
+                    <p>没有成语链包含：
+                        <span class="text" style="color: red; font-size: 16px; margin-right: 10px"></span>, 您可以创建该成语链。
+                    </p>
+                </div>
+                <div class="create">
+                    <input class="create_text" type="text" value="" placeholder="请输入成语"/>
+                    <input class="create_button"  type="button" value="创建">
+                </div>
+            </div>
+
         </div>
-
-        <div class="search_null">
-            <div class="count">
-                <p>没有成语链包含：<span class="text" style="color: red; font-size: 16px">你好成语</span></p>
-                <p style="margin-top: 10px">您可以创建成语链。若创建成功，您将获得一定的<span style="color: red; font-size: 16px">NAS奖励</span>，
-                    因此需要您提供<span style="color: red; font-size: 16px">地址</span>。</p>
-            </div>
-            <div class="create">
-                <input class="create_text" type="text" value="" placeholder="请输入成语"/>
-                <input class="create_button"  type="button" value="创建">
-            </div>
-        </div>
-
     </div>
+</div>
+
+<div id="root">
+    <p>Copyright © 2018 ALISURE & Nebulas.io</p>
 </div>
 
 </body>
 </html>
-
-
-
-
-
-
-
-

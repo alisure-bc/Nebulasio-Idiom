@@ -35,7 +35,18 @@ function init() {
         }, function (search_value) {
             check_idiom(search_value);
         });
-        /*成功后搜索成语，得到该成语所在的成语链*/
+    });
+    $("#SearchTwo .create_text").on("keypress", function (event) {
+        if(event.keyCode == 13){
+            var value = $(this).val();
+            /*需要检查一下*/
+            alert("check value");
+            create_data(value, function (search_value) {
+                alert("创建失败了哥！");
+            }, function (search_value) {
+                check_idiom(search_value);
+            });
+        }
     });
 }
 
@@ -43,14 +54,27 @@ function init() {
 function search_init() {
     $("#SearchFirst .search_button").click(function () {
         var search_value = $(this).prev().val();
-
         /*检查search_value,若成功，调用回调函数，否则给出提示错误*/
         check_idiom(search_value);
+    });
+    $("#SearchFirst .search_text").on("keypress", function (event) {
+        if(event.keyCode == 13){
+            var search_value = $(this).val();
+            /*检查search_value,若成功，调用回调函数，否则给出提示错误*/
+            check_idiom(search_value);
+        }
     });
     $("#SearchTwo .search_button").click(function () {
         var search_value = $(this).prev().val();
         /*检查search_value,若成功，调用回调函数，否则给出提示错误*/
         check_idiom(search_value);
+    });
+    $("#SearchTwo .search_text").on("keypress", function (event) {
+        if(event.keyCode == 13) {
+            var search_value = $(this).val();
+            /*检查search_value,若成功，调用回调函数，否则给出提示错误*/
+            check_idiom(search_value);
+        }
     });
 }
 
@@ -91,6 +115,7 @@ function search_ok(search_value, result) {
     $("#SearchTwo").show();
     $("#SearchTwo .search_result").show();
     $("#SearchTwo .search_null").hide();
+    $("#SearchTwo .search .search_text").val("");
     if(search_value.length > 0){
         /*显示结果*/
         _show_search_result(search_value, result)
@@ -103,7 +128,6 @@ function search_ok(search_value, result) {
 function _show_search_result(search_value, result) {
 
     /*设置文字*/
-    $("#SearchTwo .search .search_text").val(search_value);
     $("#SearchTwo .search_result .count .text").text(search_value);
     $("#SearchTwo .search_result .count .number").text(result.length);
 
@@ -124,7 +148,6 @@ function _show_search_result(search_value, result) {
             }
             $result_html_item.find(".value").text(now_item.idiom);
             $result_html_item.find(".author").text(now_item.address);
-            $result_html_item.find(".award").text("20000");
             $result_html_item.find(".time").text(now_item.storageTime);
             $result_html_one.find(".append").before($result_html_item.html());  /*必须是html()*/
         }
@@ -151,7 +174,17 @@ function _show_search_result(search_value, result) {
         }, function (value) {
             check_idiom(value);
         });
-        /*成功后搜索成语，得到该成语所在的成语链*/
+    });
+    $("#SearchTwo .append_text").off("keypress").on("keypress", function (event) {
+        if(event.keyCode == 13){
+            var id = $(this).parent().attr("data_id");
+            var value = $(this).val();
+            append_data(value, parseInt(id), function () {
+                alert("接续失败了哥！");
+            }, function (value) {
+                check_idiom(value);
+            });
+        }
     });
 
 }
@@ -162,6 +195,7 @@ function search_null(search_value) {
     $("#SearchTwo").show();
     $("#SearchTwo .search_result").hide();
     $("#SearchTwo .search_null").show();
+    $("#SearchTwo .search .search_text").val("");
     if(search_value.length >= 1){
         $("#SearchTwo .search_null .count .text").text(search_value);
         $("#SearchTwo .search_null .search_text").val(search_value);

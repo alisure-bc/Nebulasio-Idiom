@@ -1,58 +1,76 @@
 
-input, ul, li, p{
+body, input, ul, li, p{
     margin: 0;
     padding: 0;
 }
 
-#Content{
-    background-color: #000;
-    width: 90%;
-    min-width: 390px;
-    max-width: 800px;
-    min-height: 500px;
-    margin: 60px auto;
-    border-radius: 10px;
-}
-
-#SearchFirst, #SearchTwo{
+/*布局*/
+body{
     display: flex;
     flex-direction: column;
-    align-items: center;  /*交叉轴：左右*/
-    height: 100%;
-
-    font-size: 0;  /*间隔的问题。或者去掉两个input之间的空格*/
+    min-height: 100vh;
 }
-#SearchFirst{
-    /*justify-content: center;*/  /*主轴：上下*/
-    padding-top: 100px;
+#top{
+    width: 100%;
+    height: 100px;
+    background: #ddf4fe url(../img/bg.gif) repeat-x 0 0;
 }
-#SearchTwo{
-    justify-content: flex-start;  /*主轴：上下*/
-    padding-top: 50px;
+#middle{
+    width: 100%;
+    margin-top: -20px;
+    background: #ddf4fe;
+    flex: 1 1 auto;
 }
-
-#SearchFirst .title{
-    width: 160px;
-    height: 60px;
-    font-size: 30px;
-    line-height: 60px;
+#root{
+    z-index: -1;
+    margin-top: -20px;
+    width: 100%;
+    height: 100px;
+    background: #ddf4fe url(../img/bg.gif) repeat-x 0 0;
+    transform: rotate(180deg);
+}
+#root p{
     text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 2px;
-    background-color: #eeeeee;
-    border-radius: 20px;
+    color: #b2b2b2;
+    padding: 30px;
+    font-size: 12px;
+    transform: rotate(180deg);
 }
-#SearchFirst .info{
-    background-color: #eeeeee;
-    max-width: 80%;
-    font-size: 14px;
-    margin: 30px 0;
-    border-radius: 10px;
+
+/*菜单*/
+#menu{
+    width: 100%;
+    height: 50px;
+    background-color: #ffffff;
 }
-#SearchFirst .info p{
-    line-height: 24px;
-    padding: 5px 20px;
+#menu .content{
+    width: 90%;
+    min-width: 390px;
+    max-width: 1080px;
+    margin: auto;
+
+    display: flex;
+    justify-content: space-between;
 }
+#menu .content img{
+    height: 42px;
+    padding: 4px;
+}
+#menu .content .menu_2{
+    display: flex;
+    align-items: center;
+}
+#menu .content .menu_2 a{
+    color: #666;
+    font-size: 16px;
+    font-weight: 400;
+    margin: 0 15px;
+    text-decoration: none;
+}
+#menu .content .menu_2 a:hover{
+    color: #000;
+}
+
 
 input{
     text-align: center;
@@ -64,29 +82,272 @@ input{
 input:focus{
     background-color: #ffffff;
 }
-
 .search  .search_text{
     height: 40px;
     width: 200px;
+    font-size: 18px;
+    border: 1px solid #84d2fb;
     border-radius: 10px 0 0 10px;
 }
 .search  .search_button{
     height: 46px;
     width: 80px;
     padding: 2px 15px;
-    font-size: 22px;
-    background-color: #cccccc;
+    font-size: 18px;
+    color: #fff;
+    background-color: #84d2fb;
+    border: 1px solid #84d2fb;
     border-radius: 0 10px 10px 0;
     vertical-align:bottom;  /*不对齐的问题*/
 }
 .search  .search_button:hover{
     cursor: pointer;
-    color: #333333;
-    background-color: #999999;
+    color: #fff;
+    background-color: #6dc8fb;
 }
 .search  .search_button:active{
     cursor: pointer;
-    color: #aaaaaa;
-    background-color: #666666;
+    color: #fff;
+    background-color: #45b3fb;
 }
 
+
+#Content{
+    background-color: #ace2fc;
+    width: 90%;
+    min-width: 390px;
+    max-width: 960px;
+    min-height: 550px;
+    margin: auto;
+    border-radius: 20px;
+}
+
+#SearchFirst, #SearchTwo{
+    display: flex;
+    flex-direction: column;
+    align-items: center;  /*交叉轴：左右*/
+    height: 100%;
+
+    font-size: 0;  /*间隔的问题。或者去掉两个input之间的空格*/
+}
+
+
+#SearchFirst{
+    padding-top: 50px;
+}
+
+#SearchFirst .title{
+    width: 160px;
+    height: 60px;
+    font-size: 30px;
+    line-height: 60px;
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 2px;
+    /*background-color: #eeeeee;*/
+    border-radius: 20px;
+}
+#SearchFirst .info{
+    max-width: 80%;
+    font-size: 14px;
+    margin: 30px 0;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #fff;
+}
+#SearchFirst .info p{
+    line-height: 24px;
+    padding: 5px 20px;
+}
+
+
+#SearchTwo{
+    justify-content: flex-start;  /*主轴：上下*/
+    padding-top: 50px;
+}
+#SearchTwo .search_result{
+    background-color: #ffffff;
+    width: 80%;
+    font-size: 14px;
+    margin: 30px 0;
+    border-radius: 10px;
+}
+/*计数*/
+#SearchTwo .search_result .count{
+    margin: 15px 20px 0;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+    color: #333333;
+}
+
+/*每一条的头部*/
+#SearchTwo .search_result .one{
+    border: 1px solid #ace2fc;
+    max-width: 100%;
+    margin: 15px 20px 0;
+    border-radius: 10px;
+}
+#SearchTwo .search_result .one:first-child{
+    margin-top: 15px;
+}
+#SearchTwo .search_result .one:last-child{
+    margin-bottom: 35px;
+}
+#SearchTwo .search_result .open{
+    display: flex;
+    justify-content: space-between;
+    background-color: #ace2fc;
+    padding: 10px;
+    color: #fff;
+    font-size: 18px;
+    border-radius: 10px 10px 0 0;
+}
+#SearchTwo .search_result .open:hover{
+    cursor: pointer;
+    background-color: #99d6fc;
+}
+#SearchTwo .search_result .open:active{
+    cursor: pointer;
+    background-color: #84cbfc;
+}
+#SearchTwo .search_result .open.radius{
+    border-radius: 10px;
+}
+
+/*每一条中的每一个成语*/
+#SearchTwo .search_result .item{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+
+    border: 1px solid #ace2fc;
+    border-radius: 5px;
+    margin: 25px;
+    padding: 5px;
+
+    position: relative;
+}
+#SearchTwo .search_result .item:hover{
+    background-color: #99d6fc;
+    color: #fff;
+    cursor: pointer;
+}
+#SearchTwo .search_result .item:first-child{
+    margin-top: 8px;
+}
+#SearchTwo .search_result .item div{
+    margin: 5px 10px;
+}
+
+/*当前成语*/
+#SearchTwo .search_result .item.current{
+    background-color: #84cbfc;
+    color: #fff;
+}
+#SearchTwo .search_result .item.current:hover{
+    cursor: pointer;
+    background-color: #99d6fc;
+    color: #fff;
+}
+#SearchTwo .search_result .item.current .value{
+    color: red;
+}
+
+/*箭头*/
+#SearchTwo .search_result .item:before{
+    content: "";
+    width: 6px;
+    height: 20px;
+    position: absolute;
+    bottom: -22px;
+    left: 35px;
+    border-radius: 5px;
+    background-color: #ace2fc;
+}
+#SearchTwo .search_result .item:after{
+    content: "";
+    width: 0;
+    height: 0;
+    position: absolute;
+    bottom: -25px;
+    left: 30px;
+    border-top: 6px solid #ace2fc;
+    border-bottom: 0 solid #ace2fc;
+    border-left: 8px solid #0000;
+    border-right: 8px solid #0000;
+}
+
+/*未搜索到结果*/
+#SearchTwo .search_null{
+    background-color: #fff;
+    width: 80%;
+    font-size: 14px;
+    margin: 50px 0;
+    padding: 30px 0;
+    border-radius: 10px;
+}
+/*计数*/
+#SearchTwo .search_null .count{
+    margin: 0 20px 20px;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+    color: #333333;
+}
+
+/*追加成语和创建成语链*/
+#SearchTwo .search_result .append{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+
+    border-radius: 5px;
+    margin: 25px 25px 10px;
+}
+#SearchTwo .search_null .create{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    border-radius: 5px;
+    margin: 5px 25px 10px;
+    padding: 10px;
+
+    font-size: 0;
+}
+#SearchTwo .append .append_text,
+#SearchTwo .create .create_text{
+    height: 40px;
+    width: 100%;
+    padding: 2px 10px;
+    border: 1px solid #84d2fb;
+    border-radius: 10px 0 0 10px;
+}
+#SearchTwo .append .append_button,
+#SearchTwo .create .create_button{
+    height: 46px;
+    width: 120px;
+    padding: 2px 15px;
+    text-align: center;
+    font-size: 18px;
+    color: #fff;
+    background-color: #84d2fb;
+    border: 1px solid #84d2fb;
+    border-radius: 0 10px 10px 0;
+    vertical-align:bottom;  /*不对齐的问题*/
+}
+#SearchTwo .append .append_button:hover,
+#SearchTwo .create .create_button:hover{
+    cursor: pointer;
+    color: #fff;
+    background-color: #6dc8fb;
+}
+#SearchTwo .append .append_button:active,
+#SearchTwo .create .create_button:active{
+    cursor: pointer;
+    color: #fff;
+    background-color: #6dc8fb;
+}
