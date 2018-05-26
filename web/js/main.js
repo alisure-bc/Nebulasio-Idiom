@@ -2,12 +2,18 @@
 var Nebulas = require("nebulas");
 var NebPay = require("nebpay");
 
-/*创建交易*/
-var neb = new Nebulas.Neb();
-neb.setRequest(new Nebulas.HttpRequest("https://testnet.nebulas.io"));
-var nebPay = new NebPay();
+// var neb = new Nebulas.Neb();
+// neb.setRequest(new Nebulas.HttpRequest("https://testnet.nebulas.io"));
+// var nebPay = new NebPay();
+// var callbackUrl =NebPay.config.testnetUrl;
+// var dapp_address = "n1gbvnmGDvfQ2Tpb8sKYdrKTcniTgfTEjH5";
 
-var dapp_address = "n1gbvnmGDvfQ2Tpb8sKYdrKTcniTgfTEjH5";
+var neb = new Nebulas.Neb();
+neb.setRequest(new Nebulas.HttpRequest("https://mainnet.nebulas.io"));
+var nebPay = new NebPay();
+var callbackUrl =NebPay.config.mainnetUrl;
+var dapp_address = "n1kGtpre6WhFK48dDUSMMZxc1QyAjFzjFfj";
+
 
 /*封装合约参数*/
 var ContractValue = function () {
@@ -29,23 +35,38 @@ function init() {
     $("#SearchTwo .create_button").click(function () {
         var value = $(this).parent().find(".create_text").val();
         /*需要检查一下*/
-        alert("check value");
-        create_data(value, function (search_value) {
-            alert("创建失败了哥！");
-        }, function (search_value) {
-            check_idiom(search_value);
-        });
+        if(value.length > 0){
+            /*需要单独写服务器处理*/
+            check_value(value, function () {
+                /*检查成功，开始执行回调*/
+                create_data(value, function (search_value) {
+                    alert("创建失败！");
+                }, function (search_value) {
+                    check_idiom(search_value);
+                });
+            });
+        }else {
+            alert("请输入一个成语");
+        }
+
     });
     $("#SearchTwo .create_text").on("keypress", function (event) {
         if(event.keyCode == 13){
             var value = $(this).val();
             /*需要检查一下*/
-            alert("check value");
-            create_data(value, function (search_value) {
-                alert("创建失败了哥！");
-            }, function (search_value) {
-                check_idiom(search_value);
-            });
+            if(value.length > 0){
+                /*需要单独写服务器处理*/
+                check_value(value, function () {
+                    /*检查成功，开始执行回调*/
+                    create_data(value, function (search_value) {
+                        alert("创建失败！");
+                    }, function (search_value) {
+                        check_idiom(search_value);
+                    });
+                });
+            }else {
+                alert("请输入一个成语");
+            }
         }
     });
 }
@@ -82,18 +103,10 @@ function search_init() {
 function check_idiom(search_value) {
     if(search_value.length > 0){
         /*需要单独写服务器处理*/
-        /*$.get("https://www.pwxcoo.com/dictionary?type=idiom&word=" + search_value, function(data) {
-            if (data.length < 5) {
-                /!*不存在该成语，显示错误*!/
-                alert("没有该成语");
-            } else{
-                /!*检查成功，开始执行回调*!/
-                callback(search_value);
-            }
-        });*/
-
-        /*检查成功，开始执行回调*/
-        search_idiom_fn(search_value);
+        check_value(search_value, function () {
+            /*检查成功，开始执行回调*/
+            search_idiom_fn(search_value);
+        });
     }else {
         alert("请输入一个成语");
     }
@@ -169,21 +182,39 @@ function _show_search_result(search_value, result) {
     $("#SearchTwo .append_button").off("click").on("click", function () {
         var id = $(this).parent().attr("data_id");
         var value = $(this).parent().find(".append_text").val();
-        append_data(value, parseInt(id), function () {
-            alert("接续失败了哥！");
-        }, function (value) {
-            check_idiom(value);
-        });
+        /*需要检查一下*/
+        if(value.length > 0){
+            /*需要单独写服务器处理*/
+            check_value(value, function () {
+                /*检查成功，开始执行回调*/
+                append_data(value, parseInt(id), function () {
+                    alert("接续失败！");
+                }, function (value) {
+                    check_idiom(value);
+                });
+            });
+        }else {
+            alert("请输入一个成语");
+        }
     });
     $("#SearchTwo .append_text").off("keypress").on("keypress", function (event) {
         if(event.keyCode == 13){
             var id = $(this).parent().attr("data_id");
             var value = $(this).val();
-            append_data(value, parseInt(id), function () {
-                alert("接续失败了哥！");
-            }, function (value) {
-                check_idiom(value);
-            });
+            /*需要检查一下*/
+            if(value.length > 0){
+                /*需要单独写服务器处理*/
+                check_value(value, function () {
+                    /*检查成功，开始执行回调*/
+                    append_data(value, parseInt(id), function () {
+                        alert("接续失败！");
+                    }, function (value) {
+                        check_idiom(value);
+                    });
+                });
+            }else {
+                alert("请输入一个成语");
+            }
         }
     });
 
@@ -240,7 +271,8 @@ function create_data(idiom_value, callback_error, callback_ok) {
     };
 
     /*发生交易，返回交易序号*/
-    var serialNumber = nebPay.call(dapp_address, contract_value.value, now_contract.function, now_contract.args, {listener: print_result});
+    var serialNumber = nebPay.call(dapp_address, contract_value.value, now_contract.function, now_contract.args,
+        {listener: print_result, callback:callbackUrl});
 
     /*定时查询交易是否成功，成功后执行回调：查询该条成语*/
     var intervalQuery = setInterval(function () {
@@ -248,7 +280,7 @@ function create_data(idiom_value, callback_error, callback_ok) {
     }, 10000);
 
     function funcIntervalQuery() {
-        nebPay.queryPayInfo(serialNumber)
+        nebPay.queryPayInfo(serialNumber, {callback: callbackUrl})
             .then(function (resp) {
                 print_result(resp);
                 var respObject = JSON.parse(resp);
@@ -292,6 +324,21 @@ function append_data(idiom_value, chain_id, callback_error, callback_ok) {
             callback_error(idiom_value)
         });
     }
+}
+
+
+/*访问服务器，检查成语*/
+function check_value(idiom_value, callback) {
+    // $.get("http://localhost:8080/idiom/query/idiom?idiom=" + idiom_value, function(data) {
+    $.get("http://www.alisure.xyz/idiom/query/idiom?idiom=" + idiom_value, function(data) {
+        if (data.status == 1) {
+            /*检查成功，开始执行回调*/
+            callback(idiom_value);
+        } else{
+            /*不存在该成语，显示错误*/
+            alert("没有该成语, 请填写正确的成语！");
+        }
+    });
 }
 
 /*打印网络返回的结果*/
